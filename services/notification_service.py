@@ -1,28 +1,29 @@
-// notification_service.ts
-import axios from 'axios';
+import requests
 
-export class NotificationService {
-  private telegramBotToken: string;
-  private telegramChatId: string;
+class NotificationService:
+    def __init__(self, telegram_bot_token: str, telegram_chat_id: str):
+        """
+        Initializes the NotificationService with Telegram credentials.
+        :param telegram_bot_token: Your Telegram Bot API token.
+        :param telegram_chat_id: The chat ID where alerts should be sent.
+        """
+        self.telegram_bot_token = telegram_bot_token
+        self.telegram_chat_id = telegram_chat_id
 
-  constructor(telegramBotToken: string, telegramChatId: string) {
-    this.telegramBotToken = telegramBotToken;
-    this.telegramChatId = telegramChatId;
-  }
+    def send_telegram_alert(self, message: str) -> None:
+        """
+        Sends an alert message to a Telegram chat using the Telegram Bot API.
+        :param message: The alert message to be sent.
+        """
+        url = f"https://api.telegram.org/bot{self.telegram_bot_token}/sendMessage"
+        payload = {
+            "chat_id": self.telegram_chat_id,
+            "text": message
+        }
 
-  // Sends a message via Telegram Bot API.
-  public async sendTelegramAlert(message: string): Promise<void> {
-    const url = `https://api.telegram.org/bot${this.telegramBotToken}/sendMessage`;
-    const payload = {
-      chat_id: this.telegramChatId,
-      text: message,
-    };
-
-    try {
-      const response = await axios.post(url, payload);
-      console.log('Telegram alert sent:', response.data);
-    } catch (error) {
-      console.error('Error sending Telegram alert:', error);
-    }
-  }
-}
+        try:
+            response = requests.post(url, json=payload)
+            response.raise_for_status()
+            print("Telegram alert sent:", response.json())
+        except Exception as e:
+            print("Error sending Telegram alert:", e)
